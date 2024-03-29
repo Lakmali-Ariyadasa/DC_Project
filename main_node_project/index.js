@@ -12,7 +12,7 @@ portfinder.getPort((err, port) => {
     const startingPort = port; 
     findNextFivePorts(startingPort);
 
-var scriptSystem = exec(`node D:/Lakmali/DC_Project/system_node_project/index.js ${startingPort}`, 
+var scriptSystem = exec(`node E:/Msc/DC/DC_Project/system_node_project/index.js ${startingPort}`, 
         (error, stdout, stderr) => {
             console.log(stdout,"stdout1");
             console.log(stderr,"stderr1");
