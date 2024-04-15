@@ -15,8 +15,8 @@ portfinder.getPort((err, port) => {
   var scriptSystem = exec(`node D:/Lakmali/DC_Project/system_node_project/index.js ${startingPort}`,
 
     (error, stdout, stderr) => {
-      console.log(stdout, "stdout1");
-      console.log(stderr, "stderr1");
+      // console.log(stdout, "stdout1");
+      // console.log(stderr, "stderr1");
       if (error !== null) {
         console.log(`exec error: ${error}`);
       }
@@ -24,8 +24,8 @@ portfinder.getPort((err, port) => {
 
   var scriptSystem2 = exec(`node D:/Lakmali/DC_Project/system_sidecar_project/index.js ${startingPort}`,
     (error, stdout, stderr) => {
-      console.log(stdout, "stdout2");
-      console.log(stderr, "stderr2");
+      // console.log(stdout, "stdout2");
+      // console.log(stderr, "stderr2");
       if (error !== null) {
         console.log(`exec error: ${error}`);
       }
@@ -58,7 +58,7 @@ portfinder.getPort((err, port) => {
         node.insertData(randomKey, randomValue);
       });
 
-      // console.log("nodeTable", this.nodeTable);
+      console.log("nodeTable", this.nodeTable);
     }
 
     generateRandomName() {
@@ -95,12 +95,12 @@ portfinder.getPort((err, port) => {
         const receiverId = hashValue % this.nodeTable.length;
         const receiver = this.nodeTable.find(node => node.id === receiverId);
         // console.log("receiver", key,"value",value);
-        this.receiveData(key, value);
+        this.receiveData(key, receiver);
       } else {
         // Store the data locally for receiver nodes
         this.valueTable[key] = value;
         console.log(`Data inserted successfully at node ${this.id}`);
-        // console.log("valueTable", this.valueTable);
+        console.log("valueTable", this.valueTable);
       }
     }
 
@@ -115,7 +115,6 @@ portfinder.getPort((err, port) => {
     }
 
     receiveData(key, value) {
-      console.log("key", key);
       // Store the first 10 characters as the key and the entire string as the value
       const hashKey = key.substring(0, 10);
       this.valueTable[hashKey] = value;
