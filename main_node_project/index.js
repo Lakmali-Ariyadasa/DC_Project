@@ -22,20 +22,12 @@ portfinder.getPort((err, port) => {
       }
     });
 
-  var scriptSystem2 = exec(`node D:/Lakmali/DC_Project/system_sidecar_project/index.js ${startingPort}`,
-    (error, stdout, stderr) => {
-      console.log(stdout, "stdout2");
-      console.log(stderr, "stderr2");
-      if (error !== null) {
-        console.log(`exec error: ${error}`);
-      }
-    });
-
   class Node {
     constructor(id, name) {
       this.id = id;
       this.name = name;
       this.port = port;
+      this.sidecarPort = port + 5;
       this.nodeTable = [];
       this.valueTable = {};
       this.role = '';
@@ -48,6 +40,7 @@ portfinder.getPort((err, port) => {
       nodes.forEach(node => {
 
         if (node !== this) {
+          this.port = this.port + 1;
           const reply = this.sendBroadcast(node);
           this.updateNodeTable(reply);
         }
@@ -56,6 +49,7 @@ portfinder.getPort((err, port) => {
 
         // Insert the random data into the node
         node.insertData(randomKey, randomValue);
+
       });
 
       console.log("nodeTable", this.nodeTable);
@@ -121,7 +115,6 @@ portfinder.getPort((err, port) => {
       console.log(`Data received and stored successfully at node ${this.id}`);
     }
 
-    
     retrieveData(key) {
 
       if (this.role === 'receiver') {
@@ -141,9 +134,55 @@ portfinder.getPort((err, port) => {
         }
       }
     }
+
+    joinSidecarNetwork(nodesSideCars) {
+
+      this.name = this.generateRandomName();
+      this.decideRole(nodesSideCars);
+      nodesSideCars.forEach(nodesSide => {
+
+        if (nodesSide !== this) {
+          this.nodesSide = this.nodesSide + 1;
+          const reply = this.sendBroadcast(nodesSide);
+          this.updateNodeTable(reply);
+        }
+        const randomKey = generateRandomKey();
+        const randomValue = generateRandomValue();
+
+        // Insert the random data into the node
+        nodesSide.insertData(randomKey, randomValue);
+          return nodesSide;
+      });
+    
+    }
+
   }
 
+  function simulateSidecarNetwork(numNodes) {
+    const nodesSideCars = [];
+    for (let i = 0; i < numNodes; i++) {
 
+      const node = new Node(i, `Node${i}`);
+      nodesSideCars.push(node);
+      node.joinSidecarNetwork(nodesSideCars);
+
+    }
+    return nodesSideCars;
+  }
+
+  const nodesSideCars = simulateSidecarNetwork(5);
+  
+  const nodesSide = startingPort + 5;
+
+  var scriptSystem2 = exec(`node D:/Lakmali/DC_Project/system_sidecar_project/index.js ${nodesSide}`,
+    (error, stdout, stderr) => {
+      console.log(stdout, "stdout2");
+      console.log(stderr, "stderr2");
+      if (error !== null) {
+        console.log(`exec error: ${error}`);
+      }
+    });
+  
   function generateRandomKey() {
     const characters = 'abcdefghijklmnopqrstuvwxyz';
     let randomKey = '';
@@ -170,9 +209,10 @@ portfinder.getPort((err, port) => {
       node.joinNetwork(nodes);
 
     }
+    // console.log("nodes", nodes);
     return nodes;
   }
-
   const nodes = simulateNetwork(5);
+
 
 })
